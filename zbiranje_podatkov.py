@@ -59,14 +59,27 @@ podatki = ['date', 'temperature_2m', 'rain']
 grupirani = [datumi, temp, dez]
 for podatek, grupa in zip(podatki, grupirani):
 	for d in hourly_dataframe[podatek]:
-		dan.append(str(d))
+		if podatek == 'date':
+			dan.append(str(d))
+		else:
+			dan.append(d)
 		stevec += 1
 		if stevec == 24:
 			stevec = 0
 			grupa.append(dan)
 			dan = []
 
-print(datumi[0], '\n',temp[0], '\n',dez[0])
+# sortiral tablele po dnevih in izračunamo povprečne temp in količino dežja
+dnevi = []
+povprecna_t_dneva = []
+povprecna_d_dneva =  []
+for i in range(len(datumi)):
+	povprecna_t_dneva.append(sum(temp[i])/24)
+	povprecna_d_dneva.append(sum(dez[i])/24)
+	dnevi.append(datumi[i][0][:11])
+
+
+print(dnevi[0], '\n', povprecna_t_dneva[0], '\n',povprecna_d_dneva[0])
 # podatke grupiram v skupine po mesecih
 
 

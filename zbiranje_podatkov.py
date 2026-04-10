@@ -39,13 +39,34 @@ hourly_data = {"date": pd.date_range(
 	freq = pd.Timedelta(seconds = hourly.Interval()),
 	inclusive = "left"
 )}
-print(hourly_data)
+# print(hourly_data)
 hourly_data["temperature_2m"] = hourly_temperature_2m
 hourly_data["rain"] = hourly_rain
 
 hourly_dataframe = pd.DataFrame(data = hourly_data)
+#print(list(hourly_dataframe['date']))
+
+#print(hourly_dataframe['date']) # prikaže vsak dan
 
 # sortiranje podatkov
+datumi = []
+temp = []
+dez = []
+
+dan = []
+stevec = 0
+podatki = ['date', 'temperature_2m', 'rain']
+grupirani = [datumi, temp, dez]
+for podatek, grupa in zip(podatki, grupirani):
+	for d in hourly_dataframe[podatek]:
+		dan.append(str(d))
+		stevec += 1
+		if stevec == 24:
+			stevec = 0
+			grupa.append(dan)
+			dan = []
+
+print(datumi[0], '\n',temp[0], '\n',dez[0])
 # podatke grupiram v skupine po mesecih
 
 

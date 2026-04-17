@@ -52,7 +52,6 @@ hourly_dataframe = pd.DataFrame(data = hourly_data)
 datumi = []
 temp = []
 dez = []
-
 dan = []
 stevec = 0
 podatki = ['date', 'temperature_2m', 'rain']
@@ -73,13 +72,45 @@ for podatek, grupa in zip(podatki, grupirani):
 dnevi = []
 povprecna_t_dneva = []
 povprecna_d_dneva =  []
+letnice = set()
 for i in range(len(datumi)):
 	povprecna_t_dneva.append(sum(temp[i])/24)
 	povprecna_d_dneva.append(sum(dez[i])/24)
 	dnevi.append(datumi[i][0][:11])
+	letnice.add(int(datumi[i][0][:4]))
 
+# podatke grupiram po letih
+leta = sorted(list(letnice))
+tabela_let = leta.copy()
+tabela_dni_po_letih = []
+tabela_t_po_letih = []
+tabela_d_po_letih = []
+dnevi_v_letu = []
+temp_v_letu = []
+dez_v_letu = []
+for i in range(len(datumi)):
+	if len(leta) == 0:
+		break
 
-print(dnevi[0], '\n', povprecna_t_dneva[0], '\n',povprecna_d_dneva[0])
+	letnica_dneva = int(dnevi[i][:4])
+
+	if letnica_dneva == leta[0]:
+		dnevi_v_letu.append(dnevi[i])
+		temp_v_letu.append(povprecna_t_dneva[i])
+		dez_v_letu.append(povprecna_d_dneva[i])
+
+	else:
+		leta.remove(leta[0])
+		tabela_dni_po_letih.append(dnevi_v_letu)
+		tabela_t_po_letih.append(temp_v_letu)
+		tabela_d_po_letih.append(dez_v_letu)
+		dnevi_v_letu = []
+		temp_v_letu = []
+		dez_v_letu = []
+
+print(tabela_dni_po_letih[0])
+print(len(tabela_t_po_letih[0]))
+print(len(tabela_d_po_letih[0]))
 # podatke grupiram v skupine po mesecih
 
 

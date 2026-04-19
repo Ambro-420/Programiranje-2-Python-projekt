@@ -108,9 +108,21 @@ for i in range(len(datumi)):
 		temp_v_letu = []
 		dez_v_letu = []
 
-print(tabela_dni_po_letih[0])
+
+# tabela_dni_po_letih je tabela, ki vsebuje tabele z datumi
+# tabele z datumi ločuje letnica, torej v prvi tabeli tabela_dni_po_letih[0] so vsi datumi v letu 2000
+print(tabela_dni_po_letih[0]) 
+
+# spodnji dve tabeli sta tebeli tabel, podobno kot vzgoraj le za povprecne temperature dni in kolicine dezja
 print(len(tabela_t_po_letih[0]))
 print(len(tabela_d_po_letih[0]))
+
+# tabele so povezane z indeksi
+# torej 
+print(tabela_dni_po_letih[0][0], tabela_t_po_letih[0][0], tabela_d_po_letih[0][0])
+
+
+
 # podatke grupiram v skupine po mesecih
 
 

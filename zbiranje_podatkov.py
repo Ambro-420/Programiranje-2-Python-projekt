@@ -108,10 +108,41 @@ for i in range(len(datumi)):
 		temp_v_letu = []
 		dez_v_letu = []
 
+# podatke grupiramo po mesecih (ne vklučuje porazdelitev po letih)
+tabela_dni_po_mesecih = []
+tabela_t_po_mesecih = []
+tabela_d_po_mesecih = []
+
+for i in range(len(tabela_dni_po_letih)):
+    leto = tabela_dni_po_letih[i]
+    tabela_dni_po_mesecih.append([leto[0]]) # dodamo leto, seznam za prvi mesec in prvi dan v mesecu
+    tabela_t_po_mesecih.append([tabela_t_po_letih[i][0]])
+    tabela_d_po_mesecih.append([tabela_d_po_letih[i][0]])
+    
+    # delamo od drugega dne naprej
+    indeks_dan = 1
+    while indeks_dan < len(leto):
+        danes = leto[indeks_dan]
+        vceraj = leto[indeks_dan - 1]
+        
+        # danasji dez in temperatura
+        temperatura = tabela_t_po_letih[i][indeks_dan]
+        dez = tabela_d_po_letih[i][indeks_dan]
+        
+        if danes[5:7] != vceraj[5:7]: # primerjamo mesece
+            tabela_dni_po_mesecih.append([danes]) # doda nov seznam za novi mesec
+            tabela_t_po_mesecih.append([temperatura])
+            tabela_d_po_mesecih.append([dez])
+        else:
+            tabela_dni_po_mesecih[-1].append(danes)# zadnjemu mesecu dodamo dan
+            tabela_t_po_mesecih[-1].append(temperatura)
+            tabela_d_po_mesecih[-1].append(dez)
+        
+        indeks_dan += 1
 
 # tabela_dni_po_letih je tabela, ki vsebuje tabele z datumi
 # tabele z datumi ločuje letnica, torej v prvi tabeli tabela_dni_po_letih[0] so vsi datumi v letu 2000
-print(tabela_dni_po_letih[0]) 
+print(len(tabela_dni_po_letih))
 
 # spodnji dve tabeli sta tebeli tabel, podobno kot vzgoraj le za povprecne temperature dni in kolicine dezja
 print(len(tabela_t_po_letih[0]))
@@ -122,6 +153,10 @@ print(len(tabela_d_po_letih[0]))
 print(tabela_dni_po_letih[0][0], tabela_t_po_letih[0][0], tabela_d_po_letih[0][0])
 
 
+# TEST ZA MESECE
+print(len(tabela_dni_po_mesecih[0])) # 108 mesecov v 9 letih
+print(tabela_t_po_mesecih[0])
+print(tabela_d_po_mesecih[0])
 
 # podatke grupiram v skupine po mesecih
 

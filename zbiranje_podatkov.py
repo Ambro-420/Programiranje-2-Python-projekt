@@ -89,8 +89,6 @@ dnevi_v_letu = []
 temp_v_letu = []
 dez_v_letu = []
 for i in range(len(datumi)):
-	if len(leta) == 0:
-		break
 
 	letnica_dneva = int(dnevi[i][:4])
 
@@ -107,7 +105,11 @@ for i in range(len(datumi)):
 		dnevi_v_letu = []
 		temp_v_letu = []
 		dez_v_letu = []
-
+# dodaj še zadnje leto
+if dnevi_v_letu:
+    tabela_dni_po_letih.append(dnevi_v_letu)
+    tabela_t_po_letih.append(temp_v_letu)
+    tabela_d_po_letih.append(dez_v_letu)
 # podatke grupiramo po mesecih (ne vklučuje porazdelitev po letih)
 tabela_dni_po_mesecih = []
 tabela_t_po_mesecih = []
@@ -140,25 +142,31 @@ for i in range(len(tabela_dni_po_letih)):
         
         indeks_dan += 1
 
-# tabela_dni_po_letih je tabela, ki vsebuje tabele z datumi
-# tabele z datumi ločuje letnica, torej v prvi tabeli tabela_dni_po_letih[0] so vsi datumi v letu 2000
-print(len(tabela_dni_po_letih))
-
-# spodnji dve tabeli sta tebeli tabel, podobno kot vzgoraj le za povprecne temperature dni in kolicine dezja
-print(len(tabela_t_po_letih[0]))
-print(len(tabela_d_po_letih[0]))
-
 # tabele so povezane z indeksi
 # torej 
-print(tabela_dni_po_letih[0][0], tabela_t_po_letih[0][0], tabela_d_po_letih[0][0])
-
+#print(tabela_dni_po_letih[0][0], tabela_t_po_letih[0][0], tabela_d_po_letih[0][0])
 
 # TEST ZA MESECE
-print(len(tabela_dni_po_mesecih[0])) # 108 mesecov v 9 letih
+#print(tabela_let[0])
+#print(len(tabela_dni_po_mesecih)) # 120 mesecov v 10 letih
+#print(tabela_t_po_mesecih[0])
+#print(tabela_d_po_mesecih[0])
+
+meseci = [1,2,3,4,5,6,7,8,9,10,11,12]
+imena_mesecev = ["J", "F", "M", "A","M","J","J","A", "S","O","N","D"]
+
+povprecna_t_meseca = []
+povprecna_d_meseca = []
+i = 0
+while i != 120:
+	t_meseca = sum(tabela_t_po_mesecih[i])/len(tabela_t_po_mesecih[i])
+	d_meseca = sum(tabela_d_po_mesecih[i])/len(tabela_d_po_mesecih[i])
+	povprecna_t_meseca.append(t_meseca)
+	povprecna_d_meseca.append(d_meseca)
+	i += 1
+
+print(povprecna_t_meseca[0])
 print(tabela_t_po_mesecih[0])
-print(tabela_d_po_mesecih[0])
-
-# podatke grupiram v skupine po mesecih
-
+# sedaj imam tabeli v katerih sta vrednosti za temperature in dež
 
 # risanje klimografa

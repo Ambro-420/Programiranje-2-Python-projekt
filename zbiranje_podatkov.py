@@ -167,29 +167,31 @@ print(povprecna_t_meseca[0:12])
 print(povprecna_d_meseca[0:12])
 # risanje klimografa
 
-# Meseci
-meseci = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
-x = np.arange(len(meseci))
+def risanje_klimograma(leto, povp_temp, povp_pad):
+	"""funkcija izriše klimogam in ga shrani"""
+	meseci = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+	x = np.arange(len(meseci))
 
-# Primer podatkov 
+	fig, ax1 = plt.subplots()
+
+	# Stolpci za padavine
+	ax1.bar(x, padavine, color='b')
+	ax1.set_ylabel('Padavine (mm)', color='b')
+
+
+	# Druga os za temperaturo
+	ax2 = ax1.twinx()
+	ax2.plot(x, temperature, color='red', linewidth=2)
+	ax2.set_ylabel('Temperatura (°C)', color='red')
+	ax2.set_ylim(-10, 40)
+
+	# Osi in oznake
+	plt.xticks(x, meseci)
+	plt.title(f'Klimatski diagram leta {leto}')
+
+	plt.savefig(f"klimogram_{leto}")
+
 temperature = povprecna_t_meseca[0:12]
 padavine = povprecna_d_meseca[0:12]
-
-fig, ax1 = plt.subplots()
-
-# Stolpci za padavine
-ax1.bar(x, padavine, color='b')
-ax1.set_ylabel('Padavine (mm)', color='b')
-
-
-# Druga os za temperaturo
-ax2 = ax1.twinx()
-ax2.plot(x, temperature, color='red', linewidth=2)
-ax2.set_ylabel('Temperatura (°C)', color='red')
-ax2.set_ylim(-10, 40)
-
-# Osi in oznake
-plt.xticks(x, meseci)
-plt.title(f'Klimatski diagram leta {tabela_let[0]}')
-
-plt.show()
+leto = 2000
+risanje_klimograma(leto, temperature, padavine)

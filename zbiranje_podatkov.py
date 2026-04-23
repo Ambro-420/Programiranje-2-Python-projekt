@@ -176,8 +176,9 @@ def risanje_klimograma(leto, povp_temp, povp_pad):
 
 	# Stolpci za padavine
 	ax1.bar(x, padavine, color='b')
+	ax1.set_yticks([0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35])
+	ax1.set_yticklabels([0, 50, 100, 150, 200, 250, 300, 350])
 	ax1.set_ylabel('Padavine (mm)', color='b')
-
 
 	# Druga os za temperaturo
 	ax2 = ax1.twinx()

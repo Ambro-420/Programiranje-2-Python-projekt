@@ -4,6 +4,7 @@ import openmeteo_requests
 import pandas as pd
 import requests_cache
 from retry_requests import retry
+import numpy as np
 
 
 # pridobivanje podatkov
@@ -152,9 +153,6 @@ for i in range(len(tabela_dni_po_letih)):
 #print(tabela_t_po_mesecih[0])
 #print(tabela_d_po_mesecih[0])
 
-meseci = [1,2,3,4,5,6,7,8,9,10,11,12]
-imena_mesecev = ["J", "F", "M", "A","M","J","J","A", "S","O","N","D"]
-
 povprecna_t_meseca = []
 povprecna_d_meseca = []
 i = 0
@@ -165,8 +163,33 @@ while i != 120:
 	povprecna_d_meseca.append(d_meseca)
 	i += 1
 
-print(povprecna_t_meseca[0])
-print(tabela_t_po_mesecih[0])
-# sedaj imam tabeli v katerih sta vrednosti za temperature in dež
-
+print(povprecna_t_meseca[0:12])
+print(povprecna_d_meseca[0:12])
 # risanje klimografa
+
+# Meseci
+meseci = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
+x = np.arange(len(meseci))
+
+# Primer podatkov 
+temperature = povprecna_t_meseca[0:12]
+padavine = povprecna_d_meseca[0:12]
+
+fig, ax1 = plt.subplots()
+
+# Stolpci za padavine
+ax1.bar(x, padavine, color='b')
+ax1.set_ylabel('Padavine (mm)', color='b')
+
+
+# Druga os za temperaturo
+ax2 = ax1.twinx()
+ax2.plot(x, temperature, color='red', linewidth=2)
+ax2.set_ylabel('Temperatura (°C)', color='red')
+ax2.set_ylim(-10, 40)
+
+# Osi in oznake
+plt.xticks(x, meseci)
+plt.title(f'Klimatski diagram leta {tabela_let[0]}')
+
+plt.show()

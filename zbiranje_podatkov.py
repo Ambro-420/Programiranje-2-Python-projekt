@@ -5,23 +5,116 @@ import pandas as pd
 import requests_cache
 from retry_requests import retry
 import numpy as np
-
+from geopy.geocoders import Nominatim
+from datetime import datetime
+import calendar
 
 # pridobivanje podatkov
 
-# Setup the Open-Meteo API client with cache and retry on error
+# Open-Meteo API in geolocator setup
 cache_session = requests_cache.CachedSession('.cache', expire_after = -1)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
+geolocator = Nominatim(user_agent="my_app")
+
+# ni varovalne mreže, ker geolocator deluje tudi z poštnimi ševilkami
+koordinate = geolocator.geocode(input("Željena lokacija: "))
+x = round(koordinate.latitude, 4)
+y = round(koordinate.longitude, 4)
+lokacija = str(koordinate)
+
+# datume bomo omejili od 1940 do 2025
+
+while True:
+    try:
+        date_str = input("Vnesi začetni datum: ")
+        parts = date_str.split("-")
+
+        year = int(parts[0])
+        if year < 1940 or year > 2025:
+            raise ValueError("Leto mora biti med 1940 in 2025")
+
+        if len(parts) == 1:
+            start_date = datetime(year, 1, 1)
+
+        elif len(parts) == 2:
+            month = int(parts[1])
+            if not 1 <= month <= 12:
+                raise ValueError("Mesec mora biti med 01 in 12")
+
+            start_date = datetime(year, month, 1)
+
+        elif len(parts) == 3:
+            month = int(parts[1])
+            day = int(parts[2])
+
+            if not 1 <= month <= 12:
+                raise ValueError("Mesec mora biti med 01 in 12")
+
+            start_date = datetime(year, month, day)
+
+        else:
+            raise ValueError("Napačen format")
+
+        break  # če uspe → ven iz zanke
+
+    except Exception as e:
+        print("Napaka:", e)
+        print("Poskusi znova.\n")
+
+
+while True:
+    try:
+        date_str = input("Vnesi končni datum: ")
+        parts = date_str.split("-")
+
+        year = int(parts[0])
+        if year < 1940 or year > 2025:
+            raise ValueError("Leto mora biti med 1940 in 2025")
+
+        if len(parts) == 1:
+            end_date = datetime(year - 1, 12, 31)
+
+        elif len(parts) == 2:
+            month = int(parts[1])
+            if not 1 <= month <= 12:
+                raise ValueError("Mesec mora biti med 01 in 12")
+
+            last_day = calendar.monthrange(year, month)[1]
+            end_date = datetime(year, month, last_day)
+
+        elif len(parts) == 3:
+            month = int(parts[1])
+            day = int(parts[2])
+
+            if not 1 <= month <= 12:
+                raise ValueError("Mesec mora biti med 01 in 12")
+
+            end_date = datetime(year, month, day)
+
+        break
+
+    except Exception as e:
+        print("Napaka:", e)
+        print("Poskusi znova.\n")
+
+
+# dodatna kontrola
+if start_date > end_date:
+    print("Napaka: začetni datum je večji od končnega!")
+else:
+    print("OK!")
+    zacetk = str(start_date)[:10]
+    konec = str(end_date)[:10]
 
 # Make sure all required weather variables are listed here
 # The order of variables in hourly or daily is important to assign them correctly below
 url = "https://archive-api.open-meteo.com/v1/archive"
 params = {
-	"latitude": 46.0511,
-	"longitude": 14.5051,
-	"start_date": "2000-01-01",
-	"end_date": "2009-12-31",
+	"latitude": x,
+	"longitude": y,
+	"start_date": zacetk,
+	"end_date": konec,
 	"hourly": ["temperature_2m", "rain"],
 	"timezone": "auto",
 }
@@ -156,7 +249,7 @@ for i in range(len(tabela_dni_po_letih)):
 povprecna_t_meseca = []
 povprecna_d_meseca = []
 i = 0
-while i != 120:
+while i != len(tabela_dni_po_mesecih):
 	t_meseca = sum(tabela_t_po_mesecih[i])/len(tabela_t_po_mesecih[i])
 	d_meseca = sum(tabela_d_po_mesecih[i])/len(tabela_d_po_mesecih[i])
 	povprecna_t_meseca.append(t_meseca)
@@ -167,7 +260,7 @@ print(povprecna_t_meseca[0:12])
 print(povprecna_d_meseca[0:12])
 # risanje klimografa
 
-def risanje_klimograma(leto, povp_temp, povp_pad):
+def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
 	"""funkcija izriše klimogam in ga shrani"""
 	meseci = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
 	x = np.arange(len(meseci))
@@ -187,12 +280,13 @@ def risanje_klimograma(leto, povp_temp, povp_pad):
 	ax2.set_ylim(-10, 40)
 
 	# Osi in oznake
+	mesto = str(lokacija.split(",")[0])
 	plt.xticks(x, meseci)
-	plt.title(f'Klimatski diagram leta {leto}')
+	plt.title(f'Klimogram {mesto} leta {leto}')
 
-	plt.savefig(f"klimogram_{leto}")
+	plt.savefig(f"klimogram_{mesto}")
 
 temperature = povprecna_t_meseca[0:12]
 padavine = povprecna_d_meseca[0:12]
 leto = 2000
-risanje_klimograma(leto, temperature, padavine)
+risanje_klimograma(leto, temperature, padavine, lokacija)

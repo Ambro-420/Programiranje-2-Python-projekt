@@ -330,7 +330,23 @@ if len(povp_temp_leta) > 0:
 
 y_temp = pet_letna_povp
 X = range(0, len(y_temp))
-print(X)
-print(y_temp)
+# print(X)
+# print(y_temp)
 #plt.scatter(X, y_januar, color='k')
 #plt.show()
+
+#Napoved
+# imamo matriko_t ki ima povprečne temperature glede na mesece in za vsako leto
+if stevilo_let > 1:
+    matrika_t_po_mesecih = np.transpose(matrika_t) # transponiramo da razdelimo povprečja po mesecih
+    matrika_d_po_mesecih = np.transpose(matrika_d)
+    napoved_t = []
+    napoved_d = []
+    for i in range(12): # izračuna napovedi z mnk (kar je np.polyfit)
+        temp_a, temp_b = np.polyfit(tabela_let, matrika_t_po_mesecih[i], 1)
+        dez_a, dez_b = np.polyfit(tabela_let, matrika_d_po_mesecih[i], 1)
+        napoved_t.append(round(float(temp_a * (tabela_let[-1] + 1) + temp_b), 8))
+        napoved_d.append(round(float(dez_a * (tabela_let[-1] + 1) + dez_b), 8))
+
+#print(napoved_t)
+print(matrika_t[0])

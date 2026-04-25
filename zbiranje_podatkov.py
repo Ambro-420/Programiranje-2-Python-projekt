@@ -107,6 +107,8 @@ else:
     zacetk = str(start_date)[:10]
     konec = str(end_date)[:10]
 
+
+
 # Make sure all required weather variables are listed here
 # The order of variables in hourly or daily is important to assign them correctly below
 url = "https://archive-api.open-meteo.com/v1/archive"
@@ -256,8 +258,6 @@ while i != len(tabela_dni_po_mesecih):
 	povprecna_d_meseca.append(d_meseca)
 	i += 1
 
-print(povprecna_t_meseca[0:12])
-print(povprecna_d_meseca[0:12])
 # risanje klimografa
 
 def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
@@ -289,4 +289,26 @@ def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
 temperature = povprecna_t_meseca[0:12]
 padavine = povprecna_d_meseca[0:12]
 leto = 2000
-risanje_klimograma(leto, temperature, padavine, lokacija)
+print(tabela_let)
+
+# sortiranje po letih
+temp_let = []
+pad_let = []
+while len(povprecna_t_meseca) != 0:
+    temp_leta = povprecna_t_meseca[0:12]
+    temp_let.append(temp_leta)
+
+    pad_leta = povprecna_d_meseca[0:12]
+    pad_let.append(pad_leta)
+
+    del  povprecna_t_meseca[0:12]
+    del povprecna_d_meseca[0:12]
+
+# matriki [[temperature zacetnega leta po mesecih],...,[temp koncnega leta po mesecih]] 
+matrika_t = np.array(temp_let)
+matrika_d = np.array(pad_let)
+
+
+vsote_po_mesecih = np.sum(matrika_t, axis=0)
+print(vsote_po_mesecih[0])
+#risanje_klimograma(leto, temperature, padavine, lokacija)

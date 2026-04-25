@@ -286,17 +286,17 @@ def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
 
 	plt.savefig(f"klimogram_{mesto}")
 
-temperature = povprecna_t_meseca[0:12]
-padavine = povprecna_d_meseca[0:12]
-leto = 2000
-print(tabela_let)
 
 # sortiranje po letih
 temp_let = []
 pad_let = []
+povp_temp_leta = [] # povprečna temperatura leta
 while len(povprecna_t_meseca) != 0:
     temp_leta = povprecna_t_meseca[0:12]
     temp_let.append(temp_leta)
+
+    povp_t_leta = sum(povprecna_t_meseca[0:12]) / 12
+    povp_temp_leta.append(povp_t_leta)
 
     pad_leta = povprecna_d_meseca[0:12]
     pad_let.append(pad_leta)
@@ -308,7 +308,29 @@ while len(povprecna_t_meseca) != 0:
 matrika_t = np.array(temp_let)
 matrika_d = np.array(pad_let)
 
+# risanje povprecja vnešenh let
+stevilo_let = len(tabela_let)
 
-vsote_po_mesecih = np.sum(matrika_t, axis=0)
-print(vsote_po_mesecih[0])
-#risanje_klimograma(leto, temperature, padavine, lokacija)
+temperature = np.mean(matrika_t, axis=0)
+padavine = np.mean(matrika_d, axis=0)
+leta = f"{leta[0]}-{leta[-1]}"
+#risanje_klimograma(leta, temperature, padavine, lokacija)
+
+# računanje povprečne temperature za interval 5 let
+pet_letna_povp = []
+while len(povp_temp_leta) >= 5:
+    petih_let = sum(povp_temp_leta[0:5]) / 5
+    pet_letna_povp.append(petih_let)
+
+    del povp_temp_leta[0:5]
+
+if len(povp_temp_leta) > 0:
+    pet_letna_povp.append(sum(povp_temp_leta) / len(povp_temp_leta))
+
+
+y_temp = pet_letna_povp
+X = range(0, len(y_temp))
+print(X)
+print(y_temp)
+#plt.scatter(X, y_januar, color='k')
+#plt.show()

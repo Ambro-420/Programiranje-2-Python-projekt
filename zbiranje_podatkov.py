@@ -9,7 +9,7 @@ from geopy.geocoders import Nominatim
 from datetime import datetime
 import calendar
 import pprint
-
+import os
 # pridobivanje podatkov
 
 # Open-Meteo API in geolocator setup
@@ -23,7 +23,7 @@ koordinate = geolocator.geocode(input("Željena lokacija: "))
 x = round(koordinate.latitude, 4)
 y = round(koordinate.longitude, 4)
 lokacija = str(koordinate)
-print(lokacija)
+
 # datume bomo omejili od 1940-01-01 do 2025-12-31
 
 while True:
@@ -247,11 +247,14 @@ while i != len(tabela_dni_po_mesecih):
 	i += 1
 
 # risanje klimografa
+datoteka = os.getcwd()
 
-def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
+
+def risanje_klimograma(leto, povp_temp, povp_pad, lokacija, pot):
 	"""funkcija izriše klimogam in ga shrani"""
 	meseci = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
 	x = np.arange(len(meseci))
+
 
 	fig, ax1 = plt.subplots()
 
@@ -272,7 +275,7 @@ def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
 	plt.xticks(x, meseci)
 	plt.title(f'{mesto} v obdobju {leto} leta')
 
-	plt.savefig(f"klimogram_{mesto}")
+	plt.savefig(pot)
 
 
 # sortiranje po letih
@@ -296,14 +299,26 @@ while len(povprecna_t_meseca) != 0:
 matrika_t = np.array(temp_let)
 matrika_d = np.array(pad_let)
 
-# risanje povprecja vnešenh let
-stevilo_let = len(tabela_let)
-
 temperature = np.mean(matrika_t, axis=0)
 padavine = np.mean(matrika_d, axis=0)
 od_do = f"{tabela_let[0]}-{str(int(tabela_let[-1] + 1))}"
+mesto = str(lokacija.split(",")[0])
+
+# risanje povprecja vnešenh let
+stevilo_let = len(tabela_let)
+
+# mapa, kjer je .py datoteka
+folder = os.path.dirname(os.path.abspath(__file__))
+
+# ime datoteke
+filename = f"klimogram_{mesto}_{od_do}.png"
+
+# polna pot
+pot = os.path.join(folder, filename)
+
+
 if risanje_klimo in ["da", "ja"]:
-    risanje_klimograma(od_do, temperature, padavine, lokacija)
+    risanje_klimograma(od_do, temperature, padavine, lokacija, pot)
     plt.show()
 
 

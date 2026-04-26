@@ -8,6 +8,7 @@ import numpy as np
 from geopy.geocoders import Nominatim
 from datetime import datetime
 import calendar
+import pprint
 
 # pridobivanje podatkov
 
@@ -23,75 +24,36 @@ x = round(koordinate.latitude, 4)
 y = round(koordinate.longitude, 4)
 lokacija = str(koordinate)
 
-# datume bomo omejili od 1940 do 2025
+# datume bomo omejili od 1940-01-01 do 2025-12-31
 
 while True:
     try:
-        date_str = input("Vnesi začetni datum: ")
-        parts = date_str.split("-")
+        start_input = input("Vnesi začetno leto (YYYY): ")
+        start_year = int(start_input)
 
-        year = int(parts[0])
-        if year < 1940 or year > 2025:
+        if start_year < 1940 or start_year > 2025:
             raise ValueError("Leto mora biti med 1940 in 2025")
 
-        if len(parts) == 1:
-            start_date = datetime(year, 1, 1)
-
-        elif len(parts) == 2:
-            month = int(parts[1])
-            if not 1 <= month <= 12:
-                raise ValueError("Mesec mora biti med 01 in 12")
-
-            start_date = datetime(year, month, 1)
-
-        elif len(parts) == 3:
-            month = int(parts[1])
-            day = int(parts[2])
-
-            if not 1 <= month <= 12:
-                raise ValueError("Mesec mora biti med 01 in 12")
-
-            start_date = datetime(year, month, day)
-
-        else:
-            raise ValueError("Napačen format")
-
-        break  # če uspe → ven iz zanke
+        start_date = datetime(start_year, 1, 1)
+        break
 
     except Exception as e:
         print("Napaka:", e)
         print("Poskusi znova.\n")
 
+    except Exception as e:
+        print("Napaka:", e)
+        print("Poskusi znova.\n")
 
 while True:
     try:
-        date_str = input("Vnesi končni datum: ")
-        parts = date_str.split("-")
+        end_input = input("Vnesi končno leto (YYYY): ")
+        end_year = int(end_input)
 
-        year = int(parts[0])
-        if year < 1940 or year > 2025:
+        if end_year < 1940 or end_year > 2026:
             raise ValueError("Leto mora biti med 1940 in 2025")
 
-        if len(parts) == 1:
-            end_date = datetime(year - 1, 12, 31)
-
-        elif len(parts) == 2:
-            month = int(parts[1])
-            if not 1 <= month <= 12:
-                raise ValueError("Mesec mora biti med 01 in 12")
-
-            last_day = calendar.monthrange(year, month)[1]
-            end_date = datetime(year, month, last_day)
-
-        elif len(parts) == 3:
-            month = int(parts[1])
-            day = int(parts[2])
-
-            if not 1 <= month <= 12:
-                raise ValueError("Mesec mora biti med 01 in 12")
-
-            end_date = datetime(year, month, day)
-
+        end_date = datetime(end_year-1, 12, 31)
         break
 
     except Exception as e:
@@ -103,11 +65,37 @@ while True:
 if start_date > end_date:
     print("Napaka: začetni datum je večji od končnega!")
 else:
-    print("OK!")
     zacetk = str(start_date)[:10]
     konec = str(end_date)[:10]
 
+    # napoved bo le če je končni datum 2025-12-31, 
+    # če je manj delamo napoved za leto, ki se je že zgodilo
+    mozni_odg = ["da", "ne", "ja"]
+    napoved = "ne"
 
+    if konec == "2025-12-31" and int(zacetk[:4]) < 2025:
+        while True:
+            try:
+                risanje_klimo = input("Ali želite klimogram mesta (da/ne): ").strip().lower()
+                napoved = input("Ali želite napoved za leto 2026 (da/ne): ").strip().lower()
+                
+                if (napoved not in mozni_odg) or (risanje_klimo not in mozni_odg):
+                    raise ValueError("Vnesite 'da' ali 'ne'.")
+
+                if napoved in ["da", "ja"]:
+                    koliko_let = int(input("Koliko let (1-5): "))
+
+                    if koliko_let < 1 or koliko_let > 5:
+                        raise ValueError("Število let mora biti med 1 in 5.")
+
+                break
+
+            except Exception as e:
+                print("Napaka:", e)
+                print("Poskusi znova.\n")
+    else:
+        risanje_klimo = "da"
+        print("OK!")
 
 # Make sure all required weather variables are listed here
 # The order of variables in hourly or daily is important to assign them correctly below
@@ -282,7 +270,7 @@ def risanje_klimograma(leto, povp_temp, povp_pad, lokacija):
 	# Osi in oznake
 	mesto = str(lokacija.split(",")[0])
 	plt.xticks(x, meseci)
-	plt.title(f'Klimogram {mesto} leta {leto}')
+	plt.title(f'{mesto} v obdobju {leto} leta')
 
 	plt.savefig(f"klimogram_{mesto}")
 
@@ -313,40 +301,73 @@ stevilo_let = len(tabela_let)
 
 temperature = np.mean(matrika_t, axis=0)
 padavine = np.mean(matrika_d, axis=0)
-leta = f"{leta[0]}-{leta[-1]}"
-#risanje_klimograma(leta, temperature, padavine, lokacija)
+od_do = f"{tabela_let[0]}-{tabela_let[-1]}"
+if risanje_klimo in ["da", "ja"]:
+    risanje_klimograma(od_do, temperature, padavine, lokacija)
+    plt.show()
 
-# računanje povprečne temperature za interval 5 let
-pet_letna_povp = []
-while len(povp_temp_leta) >= 5:
-    petih_let = sum(povp_temp_leta[0:5]) / 5
-    pet_letna_povp.append(petih_let)
-
-    del povp_temp_leta[0:5]
-
-if len(povp_temp_leta) > 0:
-    pet_letna_povp.append(sum(povp_temp_leta) / len(povp_temp_leta))
-
-
-y_temp = pet_letna_povp
-X = range(0, len(y_temp))
-# print(X)
-# print(y_temp)
-#plt.scatter(X, y_januar, color='k')
-#plt.show()
 
 #Napoved
-# imamo matriko_t ki ima povprečne temperature glede na mesece in za vsako leto
-if stevilo_let > 1:
+zacetno_leto = 2026
+
+napovedi_t = []
+napovedi_d = []
+
+koef_t = []
+koef_d = []
+
+if stevilo_let > 1 and napoved in ["da", "ja"]:
+    leta_napovedi = [zacetno_leto + i for i in range(koliko_let)]
     matrika_t_po_mesecih = np.transpose(matrika_t) # transponiramo da razdelimo povprečja po mesecih
     matrika_d_po_mesecih = np.transpose(matrika_d)
-    napoved_t = []
-    napoved_d = []
-    for i in range(12): # izračuna napovedi z mnk (kar je np.polyfit)
-        temp_a, temp_b = np.polyfit(tabela_let, matrika_t_po_mesecih[i], 1)
-        dez_a, dez_b = np.polyfit(tabela_let, matrika_d_po_mesecih[i], 1)
-        napoved_t.append(round(float(temp_a * (tabela_let[-1] + 1) + temp_b), 8))
-        napoved_d.append(round(float(dez_a * (tabela_let[-1] + 1) + dez_b), 8))
+    # izračun koeficientov samo enkrat
+    for i in range(12):
+        koef_t.append(np.polyfit(tabela_let, matrika_t_po_mesecih[i], 1))
+        koef_d.append(np.polyfit(tabela_let, matrika_d_po_mesecih[i], 1))
 
-#print(napoved_t)
-print(matrika_t[0])
+    # napovedi
+    for leto in leta_napovedi:
+        vrstica_t = []
+        vrstica_d = []
+        
+        for i in range(12):
+            a_t, b_t = koef_t[i]
+            a_d, b_d = koef_d[i]
+            
+            vrstica_t.append(round(float(a_t * leto + b_t), 1))
+            vrstica_d.append(round(float(a_d * leto + b_d) * 1000, 1))
+        
+        napovedi_t.append(vrstica_t)
+        napovedi_d.append(vrstica_d)
+        print(napovedi_d)
+
+    meseci = ["jan", "feb", "mar", "apr", "maj", "jun",
+            "jul", "avg", "sep", "okt", "nov", "dec"]
+
+    print("\nNapovedi za temperature (*C): ")
+    print(f"{'m/l':<6}", end="")
+    for leto in leta_napovedi:
+        print(f"{leto:>8}", end="")
+    print()
+
+    for m in range(12):
+        print(f"{meseci[m]:<6}", end="")
+        
+        for l in range(len(leta_napovedi)):
+            print(f"{napovedi_t[l][m]:>8.1f}", end="")
+        
+        print()
+
+    print("\nNapovedi za padavine (mm): ")
+    print(f"{'m/l':<6}", end="")
+    for leto in leta_napovedi:
+        print(f"{leto:>8}", end="")
+    print()
+
+    for m in range(12):
+        print(f"{meseci[m]:<6}", end="")
+        
+        for l in range(len(leta_napovedi)):
+            print(f"{napovedi_d[l][m]:>8.1f}", end="")
+        
+        print()

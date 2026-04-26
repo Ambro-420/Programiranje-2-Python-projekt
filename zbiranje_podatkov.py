@@ -23,7 +23,7 @@ koordinate = geolocator.geocode(input("Željena lokacija: "))
 x = round(koordinate.latitude, 4)
 y = round(koordinate.longitude, 4)
 lokacija = str(koordinate)
-
+print(lokacija)
 # datume bomo omejili od 1940-01-01 do 2025-12-31
 
 while True:
@@ -301,7 +301,7 @@ stevilo_let = len(tabela_let)
 
 temperature = np.mean(matrika_t, axis=0)
 padavine = np.mean(matrika_d, axis=0)
-od_do = f"{tabela_let[0]}-{tabela_let[-1]}"
+od_do = f"{tabela_let[0]}-{str(int(tabela_let[-1] + 1))}"
 if risanje_klimo in ["da", "ja"]:
     risanje_klimograma(od_do, temperature, padavine, lokacija)
     plt.show()
@@ -339,7 +339,6 @@ if stevilo_let > 1 and napoved in ["da", "ja"]:
         
         napovedi_t.append(vrstica_t)
         napovedi_d.append(vrstica_d)
-        print(napovedi_d)
 
     meseci = ["jan", "feb", "mar", "apr", "maj", "jun",
             "jul", "avg", "sep", "okt", "nov", "dec"]
